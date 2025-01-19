@@ -9,6 +9,9 @@ docker-build:
 docker-run-deps:
 	docker exec -it news-aggregator-api composer install
 	docker exec -it news-aggregator-api chmod -R 775 storage bootstrap/cache
-	docker exec -it news-aggregator-api php artisan migrate
+	docker exec -it news-aggregator-api php artisan migrate --seed
+	docker exec -it news-aggregator-api chmod -R 775 /var/www/html/storage
+	docker exec -it news-aggregator-api chmod -R 775 /var/www/html/bootstrap/cache
+
 
 docker-run-all: docker-build docker-run-deps

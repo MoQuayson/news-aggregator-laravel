@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
@@ -43,6 +44,16 @@ class AuthController extends Controller
             return $this->serverErrorResponse('failed to register user.try again later');
         }
 
-        return $this->successResponse(null,'user created successfully',201);
+        //get user by email
+        $user = $this->userService->getUserByEmail($request->email);
+        //generate access token
+        $accessToken = $this->authService->generateToken($user);
+        $user->token = $accessToken;
+
+        return response()->json([
+            'code' => 201,
+            'message'=> 'user created successfully',
+            'data'=> $user
+        ],201);
     }
 }

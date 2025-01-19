@@ -13,16 +13,15 @@ const THE_GUARDIAN_BASE_URL = 'http://content.guardianapis.com/search';
 class ArticleService{
 
     public function getArticlesFromNYTimes(ArticleFetchOptions $options){
+        if($options->datePublished == "" || $options->datePublished == null){
+            $options->datePublished = now()->toDateString();
+        }
         $url = NY_TIMES_BASE_URL ."?q={$options->query}&api-key={$options->apiKey}&fq=pub_date:({$options->datePublished})";
         $response = Http::get($url);
 
         if($response->status() == '200')
         {
             return ArticleResource::mapNYTimesResponse($response->json('response')["docs"]);
-            // return array(
-            //     'status'=>'ok',
-            //     'data'=>$response->json('response')["docs"]
-            // );
         }
         return array(
             'status'=>'error',
@@ -31,38 +30,30 @@ class ArticleService{
     }
 
     public function getArticlesFromOpenNews(ArticleFetchOptions $options){
+        if($options->datePublished == "" || $options->datePublished == null){
+            $options->datePublished = now()->toDateString();
+        }
         $url = OPEN_NEWS_BASE_URL ."?q={$options->query}&apiKey={$options->apiKey}&from={$options->datePublished}&pageSize=10";
         $response = Http::get($url);
 
         if($response->status() == '200')
         {
             return ArticleResource::mapOpenNewsResponse($response->json('articles'));
-            // return array(
-            //     'status'=>'ok',
-            //     'data'=>$response->json('articles')
-            // );
         }
-        return array(
-            'status'=>'error',
-            'data'=>$response->json()
-        );
+        return [];
     }
 
     public function getArticlesFromTheGuardian(ArticleFetchOptions $options){
+        if($options->datePublished == "" || $options->datePublished == null){
+            $options->datePublished = now()->toDateString();
+        }
         $url = THE_GUARDIAN_BASE_URL ."?q={$options->query}&api-key={$options->apiKey}&from={$options->datePublished}&pageSize=10";
         $response = Http::get($url);
 
         if($response->status() == '200')
         {
             return ArticleResource::mapTheGuardianResponse($response->json('response')['results']);
-            // return array(
-            //     'status'=>'ok',
-            //     'data'=>$response->json('response')['results']
-            // );
         }
-        return array(
-            'status'=>'error',
-            'data'=>$response->json()
-        );
+        return [];
     }
 }
